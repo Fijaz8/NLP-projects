@@ -9,29 +9,28 @@ import numpy as np
 def clean_text(text):
   stopwords=nltk.corpus.stopwords.words('english')
   ps = PorterStemmer()
+  # Define a pattern to remove hyperlinks
+  hyperlink_pattern = r'\b\w*http[s]?://\S*\b|\b\w*www\.\S*\b'
+
+  # Remove hyperlinks
+  text = re.sub(hyperlink_pattern, '', text)
+
+  # Remove any email addresses if needed (original pattern)
+  email_pattern = r'\w+\.\w+@\w+\.\w+'
+  text = re.sub(email_pattern, '', text)
+
+# Remove mentions and hashtags
+  mention_hashtag_pattern = r'\b[@#]\w+\b'
+  text = re.sub(mention_hashtag_pattern, '', text)
+    
+
   text=re.sub(r'[^A-Z a-z]','',text)
-  text=re.sub(r'^# @ _ ',' ',text)
+  text = re.sub(r'[@#_]', ' ', text)
   text=text.lower()
   text=text.split()
   text=[ps.stem(word) for word in text if word not in stopwords]
   text=" ".join(text)
   return text
-
-def lookup(freqs, word, label):
-    '''
-    Input:
-        freqs: a dictionary with the frequency of each pair (or tuple)
-        word: the word to look up
-        label: the label corresponding to the word
-    Output:
-        n: the number of times the word with its corresponding label appears.
-    '''
-    n = 0  # freqs.get((word, label), 0)
-
-    pair = (word, label)
-    if (pair in freqs):
-        n = freqs[pair]
-    return n
 
 from nltk.tokenize import word_tokenize
 def process_tweet(tweets):
